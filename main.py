@@ -3,6 +3,7 @@ from simulation.renderer import Renderer
 import models.constants
 from simulation.camera import Camera
 from simulation.grid import GridRenderer
+from simulation.axes import AxisRenderer
 
 def main():
     pygame.init()
@@ -20,6 +21,7 @@ def main():
     renderer = Renderer(screen)
     camera = Camera()
     grid = GridRenderer()
+    axes = AxisRenderer(pygame.font.SysFont(None, 24))
     running = True
 
     while running:
@@ -30,6 +32,7 @@ def main():
                 running = False
         renderer.clear(models.constants.BACKGROUND)
         grid.draw(screen, camera, models.constants.WINDOW_WIDTH, models.constants.WINDOW_HEIGHT)
+        axes.draw(screen, camera, models.constants.WINDOW_WIDTH, models.constants.WINDOW_HEIGHT)
         pygame.display.flip()
     pygame.quit()
 

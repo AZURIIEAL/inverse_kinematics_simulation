@@ -3,9 +3,37 @@
 
 A minimal inverse kinematics simulation built with Pygame.
 
-## Overview
+## Core Concepts & Math Logic
 
-This project displays an interactive inverse kinematics demo using a renderer and simple application configuration constants. The application entry point is [main.py](main.py). Core configuration values (window size, title, FPS, background color) are defined in [`models.constants`](models/constants.py), for example [`models.constants.TITLE`](models/constants.py), [`models.constants.WINDOW_WIDTH`](models/constants.py), [`models.constants.WINDOW_HEIGHT`](models/constants.py), and [`models.constants.FPS`](models/constants.py). The rendering logic is implemented in [simulation/renderer.py](simulation/renderer.py).
+The simulation uses a custom coordinate transformation system to handle an infinite, zoomable world space.
+
+### 1. Coordinate Transformations
+The `Camera` class manages the translation and scaling between **World Space** (arbitrary units) and **Screen Space** (pixels).
+
+*   **World to Screen:**
+    $$S_x = (W_x - C_x) \cdot Z + \frac{W_{screen}}{2}$$
+    $$S_y = (W_y - C_y) \cdot Z + \frac{H_{screen}}{2}$$
+    *Where $C$ is the camera position, $Z$ is the zoom level, and $S$ is the resulting screen coordinate.*
+
+*   **Screen to World:**
+    $$W_x = \frac{S_x - \frac{W_{screen}}{2}}{Z} + C_x$$
+    $$W_y = \frac{S_y - \frac{H_{screen}}{2}}{Z} + C_y$$
+
+### 2. Infinite Grid Rendering
+The `GridRenderer` ensures that the grid appears infinite by snapping the rendering window to the nearest grid lines:
+*   **Snap Logic:** `first_x = floor(world_left / spacing) * spacing`
+*   **Performance:** Lines are only drawn within the visible screen bounds (plus a small buffer).
+
+## Project Structure
+
+The project follows a decoupled architecture, separating rendering logic from coordinate systems:
+
+- **[`models/`](models/):** Contains domain models like [`Color`](models/color.py) and global [`constants`](models/constants.py).
+- **[`simulation/`](simulation/):**
+    - [`camera.py`](simulation/camera.py): Manages the viewport and coordinate math.
+    - [`grid.py`](simulation/grid.py): Handles the mathematical layout of the background grid.
+    - [`axes.py`](simulation/axes.py): Renders the primary Basis vectors and origin.
+    - [`renderer.py`](simulation/renderer.py): Low-level Pygame drawing abstraction.
 
 ## Setup
 
