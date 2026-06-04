@@ -1,6 +1,8 @@
 import pygame
 from simulation.renderer import Renderer
 import models.constants
+from simulation.camera import Camera
+from simulation.grid import GridRenderer
 
 def main():
     pygame.init()
@@ -16,6 +18,8 @@ def main():
 
     clock = pygame.time.Clock()
     renderer = Renderer(screen)
+    camera = Camera()
+    grid = GridRenderer()
     running = True
 
     while running:
@@ -25,6 +29,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
         renderer.clear(models.constants.BACKGROUND)
+        grid.draw(screen, camera, models.constants.WINDOW_WIDTH, models.constants.WINDOW_HEIGHT)
         pygame.display.flip()
     pygame.quit()
 
