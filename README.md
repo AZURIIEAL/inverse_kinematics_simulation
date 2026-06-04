@@ -19,34 +19,40 @@ The `Camera` class manages the translation and scaling between **World Space** (
     $$W_x = \frac{S_x - \frac{W_{screen}}{2}}{Z} + C_x$$
     $$W_y = \frac{S_y - \frac{H_{screen}}{2}}{Z} + C_y$$
 
-### 2. Focal Zoom Logic
-To keep the point under the mouse stable while zooming, the camera position $C$ is shifted based on the zoom change:
-$$C_{new} = C_{old} + (S_{mouse} - \text{Center}_{screen}) \cdot \left(\frac{1}{Z_{old}} - \frac{1}{Z_{new}}\right)$$
-*This ensures that the world coordinate relative to the mouse cursor remains invariant during scaling.*
+### 3. Forward Kinematics (FK)
+The `RobotRenderer` calculates the posture of the arm by accumulating joint angles and applying planar trigonometry:
+*   **Angle Accumulation:** $\Phi_i = \sum_{j=1}^{i} \theta_j$
+*   **Joint Positions:**
+    $$x_i = x_{i-1} + L_i \cos(\Phi_i)$$
+    $$y_i = y_{i-1} + L_i \sin(\Phi_i)$$
+    *Where $L_i$ is the length of link $i$, and $\theta_i$ is its relative angle.*
 
-### 3. Infinite Grid Rendering
-The `GridRenderer` ensures that the grid appears infinite by snapping the rendering window to the nearest grid lines:
-*   **Snap Logic:** `first_x = floor(world_left / spacing) * spacing`
-*   **Performance:** Lines are only drawn within the visible screen bounds (plus a small buffer).
+### 4. Infinite Grid Rendering
+The `GridRenderer` ensures that the grid appears infinite by snapping the rendering window to the nearest grid lines using `math.floor` snap logic.
 
-## Camera Controls
+## Controls
 
-| Action | Control |
-| :--- | :--- |
-| **Pan View** | Middle Mouse Button (Hold & Drag) |
-| **Focal Zoom** | Mouse Wheel (Scroll Up/Down) |
-| **Reset View** | (Coming soon) |
+| Category | Action | Key/Control |
+| :--- | :--- | :--- |
+| **Camera** | Pan View | Middle Mouse (Drag) |
+| | Focal Zoom | Mouse Wheel |
+| **Robot** | Joint 1 Rotate | `Q` / `A` |
+| | Joint 2 Rotate | `W` / `S` |
+| **Target** | Set Target | Left Mouse Click |
 
 ## Project Structure
 
-The project follows a decoupled architecture, separating rendering logic from coordinate systems:
+The project is organized into modular packages for domain modeling and simulation logic:
 
-- **[`models/`](models/):** Contains domain models like [`Color`](models/color.py) and global [`constants`](models/constants.py).
+- **[`models/`](models/):**
+    - [`robot/`](models/robot/): Domain models for `RobotArm`, `Link`, and `Joint`.
+    - [`inverse_kinematics/`](models/inverse_kinematics/): Logic for `Target` tracking.
+    - [`color.py`](models/color.py), [`constants.py`](models/constants.py): Shared types.
 - **[`simulation/`](simulation/):**
-    - [`camera.py`](simulation/camera.py): Manages the viewport and coordinate math.
-    - [`grid.py`](simulation/grid.py): Handles the mathematical layout of the background grid.
-    - [`axes.py`](simulation/axes.py): Renders the primary Basis vectors and origin.
-    - [`renderer.py`](simulation/renderer.py): Low-level Pygame drawing abstraction.
+    - [`robot/`](simulation/robot/): Rendering logic for the robotic arm.
+    - [`inverse_kinematics/`](simulation/inverse_kinematics/): Visual markers for IK targets.
+    - [`camera.py`](simulation/camera.py), [`grid.py`](simulation/grid.py), [`axes.py`](simulation/axes.py): Viewport & environment rendering.
+    - [`debug_overlay.py`](simulation/debug_overlay.py): Real-time telemetry (telemetry, FPS, coordinates).
 
 ## Setup
 
