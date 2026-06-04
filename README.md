@@ -19,10 +19,23 @@ The `Camera` class manages the translation and scaling between **World Space** (
     $$W_x = \frac{S_x - \frac{W_{screen}}{2}}{Z} + C_x$$
     $$W_y = \frac{S_y - \frac{H_{screen}}{2}}{Z} + C_y$$
 
-### 2. Infinite Grid Rendering
+### 2. Focal Zoom Logic
+To keep the point under the mouse stable while zooming, the camera position $C$ is shifted based on the zoom change:
+$$C_{new} = C_{old} + (S_{mouse} - \text{Center}_{screen}) \cdot \left(\frac{1}{Z_{old}} - \frac{1}{Z_{new}}\right)$$
+*This ensures that the world coordinate relative to the mouse cursor remains invariant during scaling.*
+
+### 3. Infinite Grid Rendering
 The `GridRenderer` ensures that the grid appears infinite by snapping the rendering window to the nearest grid lines:
 *   **Snap Logic:** `first_x = floor(world_left / spacing) * spacing`
 *   **Performance:** Lines are only drawn within the visible screen bounds (plus a small buffer).
+
+## Camera Controls
+
+| Action | Control |
+| :--- | :--- |
+| **Pan View** | Middle Mouse Button (Hold & Drag) |
+| **Focal Zoom** | Mouse Wheel (Scroll Up/Down) |
+| **Reset View** | (Coming soon) |
 
 ## Project Structure
 
