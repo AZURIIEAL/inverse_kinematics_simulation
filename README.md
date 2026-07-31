@@ -1,4 +1,3 @@
-...existing code...
 # Inverse Kinematics Simulator
 
 A minimal inverse kinematics simulation built with Pygame.
